@@ -51,6 +51,7 @@ extract_images <- function(url) {
 # Lägg till en "possibly" till "extract_images" funktionen
 extract_images_possibly <- possibly(extract_images, NA)
 
+
 # Få alla bild-beskrivningar/ bild-texter ------------------------------
 extract_image_desciptions <- function(url) {
   res <- url %>%
@@ -69,6 +70,18 @@ extract_image_desciptions <- function(url) {
 # Lägg till en possibly till "extract_image_descriptions" funktionen
 extract_image_desciptions_possibly <- possibly(extract_image_desciptions, NA)
 
+
+# Få alla huvud-texter ------------------------------ CONTINUE HERE ----------------------------------------
+extract_main_text <- function(url) {
+  res <- url %>%
+    read_html() %>%
+    html_nodes()
+  
+  return (res)
+}
+
+# Lägg till en possibly till "extract_main_text" funktionen
+extract_main_text_possibly <- possibly(extract_main_text, NA)
 
 # Få information från en sub-sida (t.ex. blommor, mosor, ormbunkar mm)
 get_information_from_subsite <- function(site_url, subsite_url) {
@@ -153,8 +166,8 @@ if (load_all_data) {
 
 
 # test_information <- get_information_from_subsite(main_site_url, blommor_subsite_url)
-test_information <- get_information_from_subsite(main_site_url, ormbunkar_subsite_url)
-# test_information <- get_information_from_subsite(main_site_url, mosor_subsite_url)
+# test_information <- get_information_from_subsite(main_site_url, ormbunkar_subsite_url)
+test_information <- get_information_from_subsite(main_site_url, mosor_subsite_url)
 # test_information <- get_information_from_subsite(main_site_url, lavar_subsite_url)
 # test_information <- get_information_from_subsite(main_site_url, svampar_subsite_url)
 
@@ -168,12 +181,13 @@ test_information <- get_information_from_subsite(main_site_url, ormbunkar_subsit
 
 # Skriv ut alla isländska namn från subsidan som precis testades
 # " ---------------------------------------- Islandska Namn ---------------------------------------- "
-
 # get("islandska_namn", test_information)
 
+# Skriv ut alla länkar till bilderna
 # " ---------------------------------------- Bilder ---------------------------------------- "
 # get("bilder", test_information)
 
+# Skriv ut alla bild-texter
 " ---------------------------------------- Bildtexter ---------------------------------------- "
 get("bild_texter", test_information)
 
