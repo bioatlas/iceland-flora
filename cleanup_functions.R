@@ -58,7 +58,8 @@ cut_dot_dot_space <- function(str) {
 # Förminska allt "whitespace" till ett mellanslag
 fix_whitespace_size <- function(str) {
   str <- str %>%
-    str_replace_all("\\s+", " ")
+    str_replace_all("\\s+", " ") %>%
+    str_trim()
   
   return (str)
 }

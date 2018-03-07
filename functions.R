@@ -3,7 +3,8 @@ extract_name_latin <- function(html_object) {
   res <- html_object %>%
     html_nodes("#page_content h2") %>%
     html_text() %>%
-    cut_n_and_t()
+    cut_n_and_t() %>%
+    fix_whitespace_size()
   
   return (res)
 }
@@ -13,14 +14,16 @@ extract_name_latin_possibly <- possibly(extract_name_latin, NA)
 
 
 # Få alla bilder från en växts sub-sida
-extract_images <- function(html_object, add_tag) {
+extract_images <- function(html_object, add_tag, url) {
   res <- html_object %>%
     html_nodes("#right_col > p > a[href]") %>%
     html_attr("href")
   
   res <- paste0(main_site_url, add_tag, res)
   
-  return (res)
+  res_tibble <- tibble(page_url = url, img_url = res)
+  
+  return (res_tibble)
 }
 
 # Lägg till en "possibly" till "extract_images" funktionen
@@ -28,13 +31,15 @@ extract_images_possibly <- possibly(extract_images, NA)
 
 
 # Få alla bild-beskrivningar/ bild-texter
-extract_image_desciptions <- function(html_object) {
+extract_image_desciptions <- function(html_object, url) {
   res <- html_object %>%
     html_nodes("#right_col > p") %>%
     html_text() %>%
     clean_up_vector()
   
-  return (res)
+  res_tibble <- tibble(page_url = url, img_desc = res)
+  
+  return (res_tibble)
 }
 
 # Lägg till en possibly till "extract_image_descriptions" funktionen

@@ -7,14 +7,20 @@ library(rvest)
 library(tidyverse)
 library(purrr)
 
-# Ladda filer
-source(functions.R)
-source(cleanup_functions.R)
-source(main_function.R)
-source(scrape.R)
-
 # Set 'working directory' så att vi kan scrapa från våran lokala nedladning av hemsidan 
-setwd("~/repos/iceland-flora/")
+# setwd("~/repos/iceland-flora/")
+# setwd("D:/Code/R/RStudio/iceland-flora/")
+
+dir <- dirname(rstudioapi::getSourceEditorContext()$path)
+setwd(dir)
+
+# Ladda filer
+source("functions.R", encoding = "utf-8")
+source("cleanup_functions.R", encoding = "utf-8")
+source("main_function.R", encoding = "utf-8")
+source("scrape.R", encoding = "utf-8")
+
+
 
 
 
@@ -26,7 +32,7 @@ main_site_url <- "floraislands.is/"
 use_actual_website <- TRUE
 
 # För testning, ladda bara t.ex. de tio första växterna, (-1 == alla växter)
-only_load_the_n_firsts_species <- -1
+only_load_the_n_firsts_species <- 10
 
 # De olika sidorna för olika växt-typer
 blommor_subsite_url <- "blom.html"
@@ -35,10 +41,10 @@ mosor_subsite_url <- "mosar.html"
 lavar_subsite_url <- "flettur.html"
 svampar_subsite_url <- "sveppir.html"
 
-# Ladda all data och skapa "bio_information" vaiablen
-load_all_data <- FALSE
-
 # Lägg till "http://www." i början av det vi ska ladda för att ansluta till 'the world wide web' om vi ska använda den riktiga hemsidan
 if (use_actual_website) {
   main_site_url <- paste0("http://www.", main_site_url)
 }  
+
+# Kör koden för att skrapa hemsidan
+scrape()

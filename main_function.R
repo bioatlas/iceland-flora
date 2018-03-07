@@ -42,7 +42,8 @@ get_information_from_subsite <- function(site_url, subsite_url) {
   
   # Spara alla islänska namn på blommorna
   vaxter_namn_is <- vaxter %>%
-    html_text()
+    html_text() %>%
+    fix_whitespace_size()
   
   # Spara alla html_länkar
   vaxter_html <- vaxter %>%
@@ -68,10 +69,12 @@ get_information_from_subsite <- function(site_url, subsite_url) {
   vaxter_namn_latin <- map_chr(loaded_html_sites, extract_name_latin_possibly)
   
   # Läs in alla bilder till alla växter
-  bilder <- map2(loaded_html_sites, bild_tag, extract_images_possibly)
+  image_url_tibble <- pmap_df(
+    list(loaded_html_sites, bild_tag, urls), 
+    extract_images_possibly)
   
   # Läs in alla bild-texter till alla växter och bilder
-  bild_texter <- map(loaded_html_sites, extract_image_desciptions_possibly)
+  image_desc_tibble <- map2_df(loaded_html_sites, urls, extract_image_desciptions_possibly)
   
   # Läs in all bröd-text till alla växter
   huvud_text <- map2(loaded_html_sites, subsite_url, extract_main_text_possibly) %>%
@@ -82,13 +85,20 @@ get_information_from_subsite <- function(site_url, subsite_url) {
     vaxter_namn_is <- vaxter_namn_is[1:only_load_the_n_firsts_species]
   }
   
-  namn_is_tibble <- tibble(page_url = urls, icelandic_name = vaxter_namn_is)
-  namn_latin_tibble <- tibble(page_url = urls, latin_name = vaxter_namn_latin)
-  
-  image_url_tibble <- map_df(page_url = urls, img_url = bilder)
-  image_desc_tibble <- map_df(page_url = urls, img_desc = bild_texter)
+  name_is_tibble <- tibble(page_url = urls, icelandic_name = vaxter_namn_is)
+  name_latin_tibble <- tibble(page_url = urls, latin_name = vaxter_namn_latin)
   
   desc_tibble <- tibble(page_url = urls, desc = huvud_text)
+  
+  # Skapa de stora tibblarna
+  taxon_core_tibble <- left_join(name_latin_tibble, name_is_tibble)
+  
+  taxon_desc_tibble <- desc_tibble
+  
+  simple_multimedia_tibble <- left_join(image_url_tibble, image_desc_tibble)
+  
+  return (list(taxon_core_tibble, taxon_desc_tibble, simple_multimedia_tibble))
+  
   
   # TODO: Create a big tibble that can be returned
   # TODO: Test if this works (it should)
