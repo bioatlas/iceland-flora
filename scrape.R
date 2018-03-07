@@ -1,39 +1,15 @@
-# see section Code style
-#browseURL("http://r-pkgs.had.co.nz/r.html")
-
-#library(lintr)
-#lint("flora_iceland.R")
-
-# setwd("~/repos/iceland-flora/")
-
-source("flora_iceland.R")
-
-pages_df <- extract_page_urls()
-page_subset <- pages_df %>% slice(1:2) %>% rename(page_url = url)
-urls <- page_subset$page_url
+scrape <- function() {
+  blommor_information <- get_information_from_subsite(main_site_url, blommor_subsite_url)
+  ormbunkar_information <- get_information_from_subsite(main_site_url, ormbunkar_subsite_url)
+  mosor_information <- get_information_from_subsite(main_site_url, mosor_subsite_url)
+  lavar_information <- get_information_from_subsite(main_site_url, lavar_subsite_url)
+  svampar_information <- get_information_from_subsite(main_site_url, svampar_subsite_url)
   
-latin_names <- map_chr(urls, possibly(extract_name_latin, NA))
-latin <- tibble(page_url = page_subset$page_url, latin_names)
-
-images <- map_df(urls, possibly(extract_images, NA))
-image_labels <- map_df(urls, possibly(extract_image_descriptions, NA))
-desc <- map_df(urls, possibly(extract_main_text, NA))
-
-df <- 
-  page_subset %>% 
-  left_join(latin) %>%
-  left_join(images) %>%
-  left_join(image_labels) %>%
-  left_join(desc)
-
-# inspect values
-df$icelandic_name
-df$theme
-df$img_urls
-df$img_desc
-df$profile_text
-
-# output to file
-write_excel_csv(df, "iceland-flora.csv")
-
-View(df)
+  bio_information <- list(
+    "blommor" = blommor_information,
+    "ormbunkar" = ormbunkar_information,
+    "mosor" = mosor_information,
+    "lavar" = lavar_information,
+    "svampar" = svampar_information
+  )
+}
