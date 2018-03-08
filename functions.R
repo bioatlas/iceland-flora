@@ -19,6 +19,12 @@ extract_images <- function(html_object, add_tag) {
     html_nodes("#right_col > p > a[href]") %>%
     html_attr("href")
   
+  if (is.na(res) || is.na(res[1])) {
+    res <- html_object %>%
+      html_nodes("#right_col > p > font > a[href]") %>%
+      html_attr("href")
+  }
+  
   res <- paste0(main_site_url, add_tag, res)
   
   return (res)
@@ -40,12 +46,8 @@ extract_image_desciptions <- function(html_object) {
     res <- html_object %>%
       html_nodes("#right_col") %>%
       html_text() %>%
-      clean_up_vector()
+      clean_up_vector() %>%
       cut_par()
-  }
-  
-  if (is.na(res[1])) {
-    print("Image desc is NA")
   }
   
   return (res)
@@ -85,13 +87,14 @@ extract_main_text <- function(html_object, subsite) {
       html_text() %>%
       clean_up_vector()
     
-    res <- more_text %>%
-      paste(collapse = " ") %>%
+    res <- res %>%
+      paste(more_text, collapse = " ") %>%
       fix_dots_and_spaces() %>%
       clean_up_vector()
+    print(res)
   }
   
-  return ("test")
+  # return ("test")
   
   return (res)
 }

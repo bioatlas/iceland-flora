@@ -28,6 +28,7 @@ cut_nbsp <- function(str) {
 
 cut_par <- function(vec) {
   vec <- vec[vec != "("]
+  vec <- vec[vec != "(Texti-4)"]
   
   return (vec)
 }

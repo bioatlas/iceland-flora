@@ -33,7 +33,7 @@ main_site_url <- "floraislands.is/"
 use_actual_website <- TRUE
 
 # För testning, ladda bara t.ex. de tio första växterna, (-1 == alla växter)
-only_load_the_n_firsts_species <- 10
+only_load_the_n_firsts_species <- 20
 
 # De olika sidorna för olika växt-typer
 blommor_subsite_url <- "blom.html"
