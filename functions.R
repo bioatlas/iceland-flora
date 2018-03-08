@@ -14,16 +14,14 @@ extract_name_latin_possibly <- possibly(extract_name_latin, NA)
 
 
 # Få alla bilder från en växts sub-sida
-extract_images <- function(html_object, add_tag, url) {
+extract_images <- function(html_object, add_tag) {
   res <- html_object %>%
     html_nodes("#right_col > p > a[href]") %>%
     html_attr("href")
   
   res <- paste0(main_site_url, add_tag, res)
   
-  res_tibble <- tibble(page_url = url, img_url = res)
-  
-  return (res_tibble)
+  return (res)
 }
 
 # Lägg till en "possibly" till "extract_images" funktionen
@@ -31,15 +29,26 @@ extract_images_possibly <- possibly(extract_images, NA)
 
 
 # Få alla bild-beskrivningar/ bild-texter
-extract_image_desciptions <- function(html_object, url) {
+extract_image_desciptions <- function(html_object) {
   res <- html_object %>%
     html_nodes("#right_col > p") %>%
     html_text() %>%
-    clean_up_vector()
+    clean_up_vector() %>%
+    cut_par()
   
-  res_tibble <- tibble(page_url = url, img_desc = res)
+  if (is.na(res[1]) || is.na(res)) {
+    res <- html_object %>%
+      html_nodes("#right_col") %>%
+      html_text() %>%
+      clean_up_vector()
+      cut_par()
+  }
   
-  return (res_tibble)
+  if (is.na(res[1])) {
+    print("Image desc is NA")
+  }
+  
+  return (res)
 }
 
 # Lägg till en possibly till "extract_image_descriptions" funktionen
@@ -68,8 +77,21 @@ extract_main_text <- function(html_object, subsite) {
     res <- res %>%
       fix_dots_and_spaces()
   } else if (subsite == lavar_subsite_url) {
+    res <- res %>%
+      fix_dots_and_spaces()
+  } else if (subsite == svampar_subsite_url) {
+    more_text <- html_object %>%
+      html_nodes("#page_content > p") %>%
+      html_text() %>%
+      clean_up_vector()
     
+    res <- more_text %>%
+      paste(collapse = " ") %>%
+      fix_dots_and_spaces() %>%
+      clean_up_vector()
   }
+  
+  return ("test")
   
   return (res)
 }

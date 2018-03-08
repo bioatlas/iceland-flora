@@ -1,5 +1,7 @@
 # Få information från en sub-sida (t.ex. blommor, mosor, ormbunkar mm)
 get_information_from_subsite <- function(site_url, subsite_url) {
+  # site_url <- main_site_url
+  # subsite_url <- blommor_subsite_url
   
   # Ladda den lokala hemsidan med alla blommor i en variabel
   flora_island_subsite <- read_html(paste0(site_url, subsite_url))
@@ -10,22 +12,26 @@ get_information_from_subsite <- function(site_url, subsite_url) {
   
   # Undantag pga männskliga fel och vilken tag man måste lägga till på main_site_url innan bild_urlen för att hitta bilden
   bild_tag <- ""
+  theme_str <- ""
   
   if (subsite_url == blommor_subsite_url) {
     # Undantag för blommor (Ej fungerande länk)
     vaxter <- vaxter[-99]
     
     bild_tag <- ""
+    theme_str <- "Plants"
     
   } else if (subsite_url == ormbunkar_subsite_url) {
     # Undantag för ormbunkar
     
     bild_tag <- "BURKNAR/"
+    theme_str <- "Ferns"
     
   } else if (subsite_url == mosor_subsite_url) {
     # Undantag för mosor
     
     bild_tag <- "MOSAR/"
+    theme_str <- "Mosses"
     
   } else if (subsite_url == lavar_subsite_url) {
     # Undantag för lavar
@@ -34,11 +40,13 @@ get_information_from_subsite <- function(site_url, subsite_url) {
     vaxter <- vaxter[2:length(vaxter)]
     
     bild_tag <- "FLETTUR/"
+    theme_str <- "Lichen"
     
   } else if (subsite_url == svampar_subsite_url) {
     # Undantag för svampar
     
     bild_tag <- "SVEPPIR/"
+    theme_str <- "Fungi"
     
   }
   
@@ -71,13 +79,17 @@ get_information_from_subsite <- function(site_url, subsite_url) {
   vaxter_namn_latin <- map_chr(loaded_html_sites, extract_name_latin_possibly)
   
   # Läs in alla bilder till alla växter
-  image_url_tibble <- pmap_df(
-    list(loaded_html_sites, bild_tag, urls), 
-    extract_images_possibly)
+  image_urls <- map2(loaded_html_sites, bild_tag, extract_images_possibly)
   
-  # Läs in alla bild-texter till alla växter och bilder
-  image_desc_tibble <- map2_df(loaded_html_sites, urls, extract_image_desciptions_possibly)
+  image_desc <- map(loaded_html_sites, extract_image_desciptions_possibly)
   
+  image_tibble <- tibble(page_url = urls[1], img_url = unlist(image_urls[1]), img_desc = unlist(image_desc[1]))
+  
+  for (n in 2:length(image_urls)) {
+    image_tibble <- image_tibble %>%
+      bind_rows(tibble(page_url = urls[n], img_url = unlist(image_urls[n]), img_desc = unlist(image_desc[n])))
+  }
+    
   # Läs in all bröd-text till alla växter
   huvud_text <- map2(loaded_html_sites, subsite_url, extract_main_text_possibly) %>%
     unlist()
@@ -87,17 +99,13 @@ get_information_from_subsite <- function(site_url, subsite_url) {
     vaxter_namn_is <- vaxter_namn_is[1:only_load_the_n_firsts_species]
   }
   
-  name_is_tibble <- tibble(page_url = urls, icelandic_name = vaxter_namn_is)
-  name_latin_tibble <- tibble(page_url = urls, latin_name = vaxter_namn_latin)
-  
   desc_tibble <- tibble(page_url = urls, desc = huvud_text)
   
-  # Skapa de stora tibblarna
-  taxon_core_tibble <- left_join(name_latin_tibble, name_is_tibble, by = "page_url")
+  taxon_core_tibble <- tibble(theme = theme_str, page_url = urls, latin_name = vaxter_namn_latin, icelandic_name = vaxter_namn_is)
   
   taxon_desc_tibble <- desc_tibble
   
-  simple_multimedia_tibble <- left_join(image_url_tibble, image_desc_tibble)
+  simple_multimedia_tibble <- image_tibble
   
   return (list(taxon_core_tibble, taxon_desc_tibble, simple_multimedia_tibble))
 }

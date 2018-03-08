@@ -26,6 +26,12 @@ cut_nbsp <- function(str) {
   return (str)
 }
 
+cut_par <- function(vec) {
+  vec <- vec[vec != "("]
+  
+  return (vec)
+}
+
 # Sammla alla funktioner för att rensa i texten i en funktion för att förenkla koden senare
 clean_up_vector <- function(vec) {
   new_vec <- vec %>%

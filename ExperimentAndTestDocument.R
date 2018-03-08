@@ -23,3 +23,16 @@ sites <- map(urls, read_html)
 ratings <- map(sites, get_rating)
 
 ratings
+
+
+
+
+
+
+# TIBBLE TEST
+
+one <- tibble(a = 1:10, b = letters[1:10])
+two <- c(1:10)
+
+bind_cols(one, c = two)
+

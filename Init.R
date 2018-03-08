@@ -8,9 +8,13 @@ library(tidyverse)
 library(purrr)
 
 # Set 'working directory' så att vi kan scrapa från våran lokala nedladning av hemsidan 
+# Linux
 # setwd("~/repos/iceland-flora/")
+
+# Windows
 # setwd("D:/Code/R/RStudio/iceland-flora/")
 
+# Universal
 dir <- dirname(rstudioapi::getSourceEditorContext()$path)
 setwd(dir)
 
@@ -19,9 +23,6 @@ source("functions.R", encoding = "utf-8")
 source("cleanup_functions.R", encoding = "utf-8")
 source("main_function.R", encoding = "utf-8")
 source("scrape.R", encoding = "utf-8")
-
-
-
 
 
 
@@ -44,7 +45,7 @@ svampar_subsite_url <- "sveppir.html"
 # Lägg till "http://www." i början av det vi ska ladda för att ansluta till 'the world wide web' om vi ska använda den riktiga hemsidan
 if (use_actual_website) {
   main_site_url <- paste0("http://www.", main_site_url)
-}  
+}
 
 # Kör koden för att skrapa hemsidan
 scrape()
