@@ -31,6 +31,8 @@ get_information_from_subsite <- function(site_url, subsite_url) {
     # Undantag för lavar
     vaxter <- vaxter[-155]
     
+    vaxter <- vaxter[2:length(vaxter)]
+    
     bild_tag <- "FLETTUR/"
     
   } else if (subsite_url == svampar_subsite_url) {
@@ -91,16 +93,11 @@ get_information_from_subsite <- function(site_url, subsite_url) {
   desc_tibble <- tibble(page_url = urls, desc = huvud_text)
   
   # Skapa de stora tibblarna
-  taxon_core_tibble <- left_join(name_latin_tibble, name_is_tibble)
+  taxon_core_tibble <- left_join(name_latin_tibble, name_is_tibble, by = "page_url")
   
   taxon_desc_tibble <- desc_tibble
   
   simple_multimedia_tibble <- left_join(image_url_tibble, image_desc_tibble)
   
   return (list(taxon_core_tibble, taxon_desc_tibble, simple_multimedia_tibble))
-  
-  
-  # TODO: Create a big tibble that can be returned
-  # TODO: Test if this works (it should)
-  # TODO: Write the rest of the "scrape.R" file
 }
