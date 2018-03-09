@@ -26,9 +26,9 @@ cut_nbsp <- function(str) {
   return (str)
 }
 
+# Ta bort alla strängar som är för korta ur en vektor
 cut_par <- function(vec) {
-  vec <- vec[vec != "("]
-  vec <- vec[vec != "(Texti-4)"]
+  vec <- vec[nchar(vec) > 9]
   
   return (vec)
 }

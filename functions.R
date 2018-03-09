@@ -19,10 +19,21 @@ extract_images <- function(html_object, add_tag) {
     html_nodes("#right_col > p > a[href]") %>%
     html_attr("href")
   
-  if (is.na(res) || is.na(res[1])) {
-    res <- html_object %>%
-      html_nodes("#right_col > p > font > a[href]") %>%
-      html_attr("href")
+  more_images <- html_object %>%
+    html_nodes("#right_col > p > font > a[href]") %>%
+    html_attr("href")
+  
+  more_images2 <- html_object %>%
+    html_nodes("#right_col > p > img") %>%
+    html_attr("src")
+  
+  if (!is.na(more_images[1])) {
+    res <- c(res, unlist(more_images)) %>%
+      unique()
+  }
+  if (!is.na(more_images2[1])) {
+    res <- c(res, unlist(more_images2)) %>%
+      unique()
   }
   
   res <- paste0(main_site_url, add_tag, res)
@@ -42,7 +53,7 @@ extract_image_desciptions <- function(html_object) {
     clean_up_vector() %>%
     cut_par()
   
-  if (is.na(res[1]) || is.na(res)) {
+  if (is.na(res[1])) {
     res <- html_object %>%
       html_nodes("#right_col") %>%
       html_text() %>%
@@ -50,6 +61,14 @@ extract_image_desciptions <- function(html_object) {
       cut_par()
   }
   
+  if (is.na(res[1])) {
+    res <- html_object %>%
+      html_nodes("#right_col > p > font") %>%
+      html_text() %>%
+      clean_up_vector() %>%
+      cut_par()    
+  }
+
   return (res)
 }
 
@@ -91,7 +110,6 @@ extract_main_text <- function(html_object, subsite) {
       paste(more_text, collapse = " ") %>%
       fix_dots_and_spaces() %>%
       clean_up_vector()
-    print(res)
   }
   
   # return ("test")

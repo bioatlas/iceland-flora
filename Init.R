@@ -15,6 +15,7 @@ library(purrr)
 # setwd("D:/Code/R/RStudio/iceland-flora/")
 
 # Universal
+# Universal
 dir <- dirname(rstudioapi::getSourceEditorContext()$path)
 setwd(dir)
 
@@ -33,7 +34,7 @@ main_site_url <- "floraislands.is/"
 use_actual_website <- TRUE
 
 # För testning, ladda bara t.ex. de tio första växterna, (-1 == alla växter)
-only_load_the_n_firsts_species <- 20
+only_load_the_n_firsts_species <- 5
 
 # De olika sidorna för olika växt-typer
 blommor_subsite_url <- "blom.html"

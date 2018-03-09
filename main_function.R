@@ -86,11 +86,12 @@ get_information_from_subsite <- function(site_url, subsite_url) {
   image_tibble <- tibble(page_url = urls[1], img_url = unlist(image_urls[1]), img_desc = unlist(image_desc[1]))
   
   for (n in 2:length(image_urls)) {
-    if (length(unlist(urls[n])) != length(unlist(image_urls[n]))) {
-      print("Error : length of page_url and image_urls")
-      print(length(unlist(urls)))
-      print(length(unlist(image_urls)))
-    }
+    # if (length(unlist(urls[n])) != length(unlist(image_urls[n]))) {
+    #   print("Error : length of page_url and image_urls")
+    #   print(length(unlist(urls[n])))
+    #   print(length(unlist(image_urls[n])))
+    #   print(unlist(urls[n]))
+    # }
     image_tibble <- image_tibble %>%
       bind_rows(tibble(page_url = urls[n], img_url = unlist(image_urls[n]), img_desc = unlist(image_desc[n])))
   }
