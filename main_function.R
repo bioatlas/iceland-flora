@@ -1,10 +1,11 @@
 # Få information från en sub-sida (t.ex. blommor, mosor, ormbunkar mm)
 get_information_from_subsite <- function(site_url, subsite_url) {
+  # Tester om man inte gör funktionen men behöver de variablarna
   # site_url <- main_site_url
-  # subsite_url <- blommor_subsite_url
+  # subsite_url <- svampar_subsite_url
   
   # Ladda den lokala hemsidan med alla blommor i en variabel
-  flora_island_subsite <- read_html(paste0(site_url, subsite_url))
+  flora_island_subsite <- read_html(paste0(site_url, subsite_url), encoding = "utf-8")
   
   # Spara alla html object som är växter ( <a href="typ_det_latinska_namnet.html">Namn på isländska</a> )
   vaxter <- flora_island_subsite %>%
@@ -72,28 +73,47 @@ get_information_from_subsite <- function(site_url, subsite_url) {
     urls <- urls[1:only_load_the_n_firsts_species]
   }
   
+  # TEST: för att testa en speciel sida med bilder eller något annat
+  # urls <- "http://floraislands.is/listeova.html"
+  
   # Ladda alla sidor så att vi slipper ladda de individuellt för varje egenskap (namn på latin, bilder, bild-texter mm)
-  loaded_html_sites <- map(urls, read_html)
+  loaded_html_sites <- map(urls, function(x) read_html(x, encoding = "utf-8"))
   
   # Läs in alla latinska namn till alla växter
   vaxter_namn_latin <- map_chr(loaded_html_sites, extract_name_latin_possibly)
+  
   
   # Läs in alla bilder till alla växter
   image_urls <- map2(loaded_html_sites, bild_tag, extract_images_possibly)
   
   image_desc <- map(loaded_html_sites, extract_image_desciptions_possibly)
   
+  length_dif <- length(unlist(image_urls[1])) - length(unlist(image_desc[1]))
+  
+  if (length_dif > 0) {
+    image_desc[1] <- list(c(unlist(image_desc[1]), unlist(rep(NA, abs(length_dif)))))
+  }
+  
   image_tibble <- tibble(page_url = urls[1], img_url = unlist(image_urls[1]), img_desc = unlist(image_desc[1]))
   
-  for (n in 2:length(image_urls)) {
-    # if (length(unlist(urls[n])) != length(unlist(image_urls[n]))) {
-    #   print("Error : length of page_url and image_urls")
-    #   print(length(unlist(urls[n])))
-    #   print(length(unlist(image_urls[n])))
-    #   print(unlist(urls[n]))
-    # }
-    image_tibble <- image_tibble %>%
-      bind_rows(tibble(page_url = urls[n], img_url = unlist(image_urls[n]), img_desc = unlist(image_desc[n])))
+  if (length(image_urls) >= 2) {
+    for (n in 2:length(image_urls)) {
+      # if (length(unlist(urls[n])) != length(unlist(image_urls[n]))) {
+      #   print("Error : length of page_url and image_urls")
+      #   print(length(unlist(urls[n])))
+      #   print(length(unlist(image_urls[n])))
+      #   print(unlist(urls[n]))
+      # }
+    
+      length_dif <- length(unlist(image_urls[n])) - length(unlist(image_desc[n]))
+    
+      if (length_dif > 0) {
+        image_desc[n] <- list(c(unlist(image_desc[n]), unlist(rep(NA, abs(length_dif)))))
+      }
+      
+      image_tibble <- image_tibble %>%
+        bind_rows(tibble(page_url = urls[n], img_url = unlist(image_urls[n]), img_desc = unlist(image_desc[n])))
+    }
   }
     
   # Läs in all bröd-text till alla växter

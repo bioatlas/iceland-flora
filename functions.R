@@ -27,12 +27,20 @@ extract_images <- function(html_object, add_tag) {
     html_nodes("#right_col > p > img") %>%
     html_attr("src")
   
+  more_images3 <- html_object %>%
+    html_nodes("#right_col > a[href]") %>%
+    html_attr("href")
+  
   if (!is.na(more_images[1])) {
     res <- c(res, unlist(more_images)) %>%
       unique()
   }
   if (!is.na(more_images2[1])) {
     res <- c(res, unlist(more_images2)) %>%
+      unique()
+  }
+  if (!is.na(more_images3[1])) {
+    res <- c(res, unlist(more_images3)) %>%
       unique()
   }
   
@@ -44,30 +52,15 @@ extract_images <- function(html_object, add_tag) {
 # Lägg till en "possibly" till "extract_images" funktionen
 extract_images_possibly <- possibly(extract_images, NA)
 
-
 # Få alla bild-beskrivningar/ bild-texter
 extract_image_desciptions <- function(html_object) {
   res <- html_object %>%
     html_nodes("#right_col > p") %>%
     html_text() %>%
+    fix_image_desc_para() %>%
     clean_up_vector() %>%
+    fix_dots_and_spaces() %>%
     cut_par()
-  
-  if (is.na(res[1])) {
-    res <- html_object %>%
-      html_nodes("#right_col") %>%
-      html_text() %>%
-      clean_up_vector() %>%
-      cut_par()
-  }
-  
-  if (is.na(res[1])) {
-    res <- html_object %>%
-      html_nodes("#right_col > p > font") %>%
-      html_text() %>%
-      clean_up_vector() %>%
-      cut_par()    
-  }
 
   return (res)
 }
@@ -95,9 +88,21 @@ extract_main_text <- function(html_object, subsite) {
     res <- res %>%
       fix_dots_and_spaces()
   } else if (subsite == mosor_subsite_url) {
+    if (identical(res, character(0))) {
+      res <- html_object %>%
+        html_nodes("#page_content") %>%
+        html_text()
+    }
+    
     res <- res %>%
       fix_dots_and_spaces()
   } else if (subsite == lavar_subsite_url) {
+    if (identical(res, character(0))) {
+      res <- html_object %>%
+        html_nodes("#page_content") %>%
+        html_text()
+    }
+    
     res <- res %>%
       fix_dots_and_spaces()
   } else if (subsite == svampar_subsite_url) {
@@ -110,9 +115,15 @@ extract_main_text <- function(html_object, subsite) {
       paste(more_text, collapse = " ") %>%
       fix_dots_and_spaces() %>%
       clean_up_vector()
+    
+    if (identical(res, character(0))) {
+      res <- html_object %>%
+        html_nodes("#right_col") %>%
+        html_text() %>%
+        fix_dots_and_spaces() %>%
+        clean_up_vector()
+    }
   }
-  
-  # return ("test")
   
   return (res)
 }

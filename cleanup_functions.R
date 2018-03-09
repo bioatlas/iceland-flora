@@ -33,6 +33,25 @@ cut_par <- function(vec) {
   return (vec)
 }
 
+# Lägg ihop vectorer baserat på mellanrum för att få en vector utan toma 
+# vectorer och för att slippa använda jobbiga xpath selektorer för att få 
+# flera stycken som en sträng
+fix_image_desc_para <- function(img_desc) {
+  newVec <- vector()
+  
+  currentStringBuildup <- ""
+  for (n in 1:length(img_desc)) {
+    if (str_trim(img_desc[n]) != "") {
+      currentStringBuildup <- paste0(currentStringBuildup, img_desc[n])
+    } else {
+      newVec <- c(newVec, currentStringBuildup)
+      currentStringBuildup <- ""
+    }
+  }
+  
+  return (newVec)
+}
+
 # Sammla alla funktioner för att rensa i texten i en funktion för att förenkla koden senare
 clean_up_vector <- function(vec) {
   new_vec <- vec %>%
