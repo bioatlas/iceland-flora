@@ -52,7 +52,7 @@ scrape <- function() {
 
   
   # View(taxon_core_tibble)
-  View(taxon_desc_tibble)
+  # View(taxon_desc_tibble)
   # View(simple_multimedia_tibble)
   
   message("Saving results: 0/3 files")
