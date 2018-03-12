@@ -49,6 +49,10 @@ fix_image_desc_para <- function(img_desc) {
     }
   }
   
+  if (currentStringBuildup != "") {
+    newVec <- c(newVec, currentStringBuildup)
+  }
+  
   return (newVec)
 }
 

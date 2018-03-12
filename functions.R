@@ -31,6 +31,10 @@ extract_images <- function(html_object, add_tag) {
     html_nodes("#right_col > a[href]") %>%
     html_attr("href")
   
+  more_images4 <- html_object %>%
+    html_nodes("#right_col > img") %>%
+    html_attr("src")
+  
   if (!is.na(more_images[1])) {
     res <- c(res, unlist(more_images)) %>%
       unique()
@@ -41,6 +45,10 @@ extract_images <- function(html_object, add_tag) {
   }
   if (!is.na(more_images3[1])) {
     res <- c(res, unlist(more_images3)) %>%
+      unique()
+  }
+  if (!is.na(more_images4[1])) {
+    res <- c(res, unlist(more_images4)) %>%
       unique()
   }
   
@@ -56,11 +64,13 @@ extract_images_possibly <- possibly(extract_images, NA)
 extract_image_desciptions <- function(html_object) {
   res <- html_object %>%
     html_nodes("#right_col > p") %>%
-    html_text() %>%
-    fix_image_desc_para() %>%
-    clean_up_vector() %>%
-    fix_dots_and_spaces() %>%
-    cut_par()
+    html_text()
+    
+    # %>%
+    # fix_image_desc_para() %>%
+    # clean_up_vector() %>%
+    # fix_dots_and_spaces() %>%
+    # cut_par()
 
   return (res)
 }
@@ -76,6 +86,14 @@ extract_main_text <- function(html_object, subsite) {
     html_text() %>%
     clean_up_vector()
   
+  title_is <- html_object %>%
+    html_nodes("#page_content > h1") %>%
+    html_text()
+  
+  title_la <- html_object %>%
+    html_nodes("#page_content > h2") %>%
+    html_text()
+  
   if (subsite == blommor_subsite_url) {
     more_text <- html_object %>%
       html_nodes("#page_content > span") %>%
@@ -84,6 +102,17 @@ extract_main_text <- function(html_object, subsite) {
     
     res <- paste0(res, ". ", more_text) %>%
       fix_dots_and_spaces()
+    
+    if (res == ".") {
+      res <- html_object %>%
+        html_nodes("#page_content") %>%
+        html_text() %>%
+        str_remove_all(title_is) %>%
+        str_remove_all(title_la)
+      
+      res <- res %>%
+        fix_dots_and_spaces()
+    }
   } else if (subsite == ormbunkar_subsite_url) {
     res <- res %>%
       fix_dots_and_spaces()
@@ -91,7 +120,9 @@ extract_main_text <- function(html_object, subsite) {
     if (identical(res, character(0))) {
       res <- html_object %>%
         html_nodes("#page_content") %>%
-        html_text()
+        html_text() %>%
+        str_remove_all(title_is) %>%
+        str_remove_all(title_la)
     }
     
     res <- res %>%
@@ -100,7 +131,9 @@ extract_main_text <- function(html_object, subsite) {
     if (identical(res, character(0))) {
       res <- html_object %>%
         html_nodes("#page_content") %>%
-        html_text()
+        html_text() %>%
+        str_remove_all(title_is) %>%
+        str_remove_all(title_la)
     }
     
     res <- res %>%

@@ -2,7 +2,7 @@
 get_information_from_subsite <- function(site_url, subsite_url) {
   # Tester om man inte gör funktionen men behöver de variablarna
   # site_url <- main_site_url
-  # subsite_url <- svampar_subsite_url
+  # subsite_url <- ormbunkar_subsite_url
   
   # Ladda den lokala hemsidan med alla blommor i en variabel
   flora_island_subsite <- read_html(paste0(site_url, subsite_url), encoding = "utf-8")
@@ -20,18 +20,21 @@ get_information_from_subsite <- function(site_url, subsite_url) {
     vaxter <- vaxter[-99]
     
     bild_tag <- ""
-    theme_str <- "Plants"
+    # Plants (blommor)
+    theme_str <- "Flowering plants"
     
   } else if (subsite_url == ormbunkar_subsite_url) {
     # Undantag för ormbunkar
     
     bild_tag <- "BURKNAR/"
+    # Ferns (ormbunkar)
     theme_str <- "Ferns"
     
   } else if (subsite_url == mosor_subsite_url) {
     # Undantag för mosor
     
     bild_tag <- "MOSAR/"
+    # Mosses (mosor)
     theme_str <- "Mosses"
     
   } else if (subsite_url == lavar_subsite_url) {
@@ -41,14 +44,15 @@ get_information_from_subsite <- function(site_url, subsite_url) {
     vaxter <- vaxter[2:length(vaxter)]
     
     bild_tag <- "FLETTUR/"
-    theme_str <- "Lichen"
+    # Lichen (lavar)
+    theme_str <- "Lichens"
     
   } else if (subsite_url == svampar_subsite_url) {
     # Undantag för svampar
     
     bild_tag <- "SVEPPIR/"
+    # Fungi (svampar)
     theme_str <- "Fungi"
-    
   }
   
   # Spara alla islänska namn på blommorna
@@ -88,33 +92,71 @@ get_information_from_subsite <- function(site_url, subsite_url) {
   
   image_desc <- map(loaded_html_sites, extract_image_desciptions_possibly)
   
-  length_dif <- length(unlist(image_urls[1])) - length(unlist(image_desc[1]))
+  test_desc <- image_desc[1] %>%
+    unlist() %>%
+    clean_up_vector() %>%
+    fix_dots_and_spaces() %>%
+    cut_par()
+  
+  length_dif <- length(unlist(image_urls[1])) - length(unlist(test_desc))
   
   if (length_dif > 0) {
-    image_desc[1] <- list(c(unlist(image_desc[1]), unlist(rep(NA, abs(length_dif)))))
+    image_desc[1] <- list(c(unlist(test_desc), unlist(rep(NA, length_dif))))
+  } else if (length_dif < 0) {
+    image_desc[1] <- image_desc[1] %>%
+      unlist() %>%
+      fix_image_desc_para() %>%
+      clean_up_vector() %>%
+      fix_dots_and_spaces() %>%
+      cut_par() %>%
+      list()
+  } else {
+    image_desc[1] <- test_desc %>%
+      list()
   }
   
   image_tibble <- tibble(page_url = urls[1], img_url = unlist(image_urls[1]), img_desc = unlist(image_desc[1]))
   
   if (length(image_urls) >= 2) {
     for (n in 2:length(image_urls)) {
-      # if (length(unlist(urls[n])) != length(unlist(image_urls[n]))) {
-      #   print("Error : length of page_url and image_urls")
-      #   print(length(unlist(urls[n])))
-      #   print(length(unlist(image_urls[n])))
-      #   print(unlist(urls[n]))
-      # }
+      test_desc <- image_desc[n] %>%
+        unlist() %>%
+        clean_up_vector() %>%
+        fix_dots_and_spaces() %>%
+        cut_par()
     
-      length_dif <- length(unlist(image_urls[n])) - length(unlist(image_desc[n]))
+      length_dif <- length(unlist(image_urls[n])) - length(unlist(test_desc))
     
       if (length_dif > 0) {
-        image_desc[n] <- list(c(unlist(image_desc[n]), unlist(rep(NA, abs(length_dif)))))
+        image_desc[n] <- list(c(unlist(test_desc), unlist(rep(NA, length_dif))))
+      } else if (length_dif < 0) {
+        image_desc[n] <- image_desc[n] %>%
+          unlist() %>%
+          fix_image_desc_para() %>%
+          clean_up_vector() %>%
+          fix_dots_and_spaces() %>%
+          cut_par() %>%
+          list()
+      } else {
+        image_desc[n] <- test_desc %>%
+          list()
+      }
+      
+      if (length(unlist(image_urls[n])) != length(unlist(image_desc[n]))) {
+        message("Error : length of image_urls and image_desc do not match!")
+        message(paste0("    Length of image_urls: ", length(unlist(image_urls[n]))))
+        message(paste0("    Length of image_desc: ", length(unlist(image_desc[n]))))
+        message(paste0("    Site url: ", unlist(urls[n])))
       }
       
       image_tibble <- image_tibble %>%
         bind_rows(tibble(page_url = urls[n], img_url = unlist(image_urls[n]), img_desc = unlist(image_desc[n])))
     }
   }
+  
+  # Ta bort de rader på växter som inte har några bilder
+  image_tibble <- image_tibble %>%
+    filter(img_url != main_site_url)
     
   # Läs in all bröd-text till alla växter
   huvud_text <- map2(loaded_html_sites, subsite_url, extract_main_text_possibly) %>%
@@ -125,13 +167,26 @@ get_information_from_subsite <- function(site_url, subsite_url) {
     vaxter_namn_is <- vaxter_namn_is[1:only_load_the_n_firsts_species]
   }
   
-  desc_tibble <- tibble(page_url = urls, desc = huvud_text)
-  
   taxon_core_tibble <- tibble(theme = theme_str, page_url = urls, latin_name = vaxter_namn_latin, icelandic_name = vaxter_namn_is)
   
-  taxon_desc_tibble <- desc_tibble
+  taxon_desc_tibble <- tibble(page_url = urls, desc = huvud_text)
   
   simple_multimedia_tibble <- image_tibble
+  
+  # Byt namn på de olika columnerna för att de ska passa i darwin core
+  taxon_core_tibble <- taxon_core_tibble %>%
+    rename(scientificName = latin_name, vernacularName = icelandic_name, taxonRemarks = theme, taxonID = page_url) %>%
+    mutate(language = "is")
+  
+  taxon_desc_tibble <- taxon_desc_tibble %>%
+    rename(description = desc, taxonID = page_url) %>%
+    mutate(creator = "Hörður Kristinsson", language = "is", license = "Unknown")
+   # LICENSE --------------------
+  
+  simple_multimedia_tibble <- simple_multimedia_tibble %>%
+    rename(identifier = img_url, description = img_desc, taxonID = page_url) %>%
+    mutate(creator = "Hörður Kristinsson", language = "is", license = "Unknown")
+  # LICENSE --------------------
   
   return (list(taxon_core_tibble, taxon_desc_tibble, simple_multimedia_tibble))
 }

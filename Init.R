@@ -8,6 +8,7 @@ message("Loading libraries...")
 library(rvest)
 library(tidyverse)
 library(purrr)
+library(dplyr)
 
 # Set 'working directory' så att vi kan scrapa från våran lokala nedladning av hemsidan 
 # Linux
