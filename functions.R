@@ -78,12 +78,6 @@ extract_image_desciptions <- function(html_object) {
   res <- html_object %>%
     html_nodes("#right_col > p") %>%
     html_text()
-    
-    # %>%
-    # fix_image_desc_para() %>%
-    # clean_up_vector() %>%
-    # fix_dots_and_spaces() %>%
-    # cut_par()
 
   return (res)
 }
@@ -94,84 +88,22 @@ extract_image_desciptions_possibly <- possibly(extract_image_desciptions, NA)
 
 # Få alla huvud-texter
 extract_main_text <- function(html_object, subsite) {
-  res <- html_object %>%
-    html_nodes("#page_content > h2 ~ *") %>%
-    html_text() %>%
-    clean_up_vector() %>%
-    paste(collapse = ". ") %>%
-    fix_dots_and_spaces()
-  
   title_is <- html_object %>%
     html_nodes("#page_content > h1") %>%
     html_text()
-  
+
   title_la <- html_object %>%
     html_nodes("#page_content > h2") %>%
     html_text()
   
-  if (subsite == blommor_subsite_url) {
-    more_text <- html_object %>%
-      html_nodes("#page_content > span") %>%
-      html_text() %>%
-      clean_up_vector()
-    
-    res <- paste0(res, ". ", more_text) %>%
-      fix_dots_and_spaces()
-    
-    if (res == ".") {
-      res <- html_object %>%
-        html_nodes("#page_content") %>%
-        html_text() %>%
-        str_remove_all(title_is) %>%
-        str_remove_all(title_la)
-      
-      res <- res %>%
-        fix_dots_and_spaces()
-    }
-  } else if (subsite == ormbunkar_subsite_url) {
-    res <- res %>%
-      fix_dots_and_spaces()
-  } else if (subsite == mosor_subsite_url) {
-    if (identical(res, character(0))) {
-      res <- html_object %>%
-        html_nodes("#page_content") %>%
-        html_text() %>%
-        str_remove_all(title_is) %>%
-        str_remove_all(title_la)
-    }
-    
-    res <- res %>%
-      fix_dots_and_spaces()
-  } else if (subsite == lavar_subsite_url) {
-    if (identical(res, character(0))) {
-      res <- html_object %>%
-        html_nodes("#page_content") %>%
-        html_text() %>%
-        str_remove_all(title_is) %>%
-        str_remove_all(title_la)
-    }
-    
-    res <- res %>%
-      fix_dots_and_spaces()
-  } else if (subsite == svampar_subsite_url) {
-    more_text <- html_object %>%
-      html_nodes("#page_content > p") %>%
-      html_text() %>%
-      clean_up_vector()
-    
-    res <- res %>%
-      paste(more_text, collapse = " ") %>%
-      fix_dots_and_spaces() %>%
-      clean_up_vector()
-    
-    if (identical(res, character(0))) {
-      res <- html_object %>%
-        html_nodes("#right_col") %>%
-        html_text() %>%
-        fix_dots_and_spaces() %>%
-        clean_up_vector()
-    }
-  }
+  res <- html_object %>%
+    html_nodes("#page_content") %>%
+    html_text() %>%
+    paste(collapse = " ") %>%
+    str_remove(title_la) %>%
+    str_remove(title_is) %>%
+    clean_up_vector() %>%
+    fix_dots_and_spaces()
   
   return (res)
 }

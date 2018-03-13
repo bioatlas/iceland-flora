@@ -21,7 +21,8 @@ cut_n_and_t <- function(str) {
 # Ta bort alla 'nbsp;' ur en sträng
 cut_nbsp <- function(str) {
   str <- str %>%
-    str_remove_all("nbsp;")
+    str_remove_all("nbsp;") %>%
+    str_remove_all("&")
   
   return (str)
 }
