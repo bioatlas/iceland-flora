@@ -55,11 +55,6 @@ get_information_from_subsite <- function(site_url, subsite_url) {
     theme_str <- "Fungi"
   }
   
-  # Spara alla islänska namn på blommorna
-  vaxter_namn_is <- vaxter %>%
-    html_text() %>%
-    fix_whitespace_size()
-  
   # Spara alla html_länkar
   vaxter_html <- vaxter %>%
     html_attr("href")
@@ -77,6 +72,10 @@ get_information_from_subsite <- function(site_url, subsite_url) {
     urls <- urls[1:only_load_the_n_firsts_species]
   }
   
+  # Ta bort kopior av länkar (Flera namn till samma växt som pekar på samma html sida)
+  urls <- urls %>%
+    unique()
+  
   # TEST: för att testa en speciel sida med bilder eller något annat
   # urls <- "http://floraislands.is/listeova.html"
   
@@ -86,6 +85,8 @@ get_information_from_subsite <- function(site_url, subsite_url) {
   # Läs in alla latinska namn till alla växter
   vaxter_namn_latin <- map_chr(loaded_html_sites, extract_name_latin_possibly)
   
+  # Läs in alla isländska namn till alla växter
+  vaxter_namn_is <- map_chr(loaded_html_sites, extract_name_is_possibly)
   
   # Läs in alla bilder till alla växter
   image_urls <- map2(loaded_html_sites, bild_tag, extract_images_possibly)
@@ -180,12 +181,12 @@ get_information_from_subsite <- function(site_url, subsite_url) {
   
   taxon_desc_tibble <- taxon_desc_tibble %>%
     rename(description = desc, taxonID = page_url) %>%
-    mutate(creator = "Hörður Kristinsson", language = "is", license = "Unknown")
+    mutate(type = "distribution", creator = "Hörður Kristinsson", language = "is", license = "Unknown")
    # LICENSE --------------------
   
   simple_multimedia_tibble <- simple_multimedia_tibble %>%
     rename(identifier = img_url, description = img_desc, taxonID = page_url) %>%
-    mutate(creator = "Hörður Kristinsson", language = "is", license = "Unknown")
+    mutate(creator = "Hörður Kristinsson", license = "Unknown", type = "StillImage", format = "image/jpg", language = "is")
   # LICENSE --------------------
   
   return (list(taxon_core_tibble, taxon_desc_tibble, simple_multimedia_tibble))

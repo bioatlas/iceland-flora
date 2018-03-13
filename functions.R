@@ -1,7 +1,7 @@
 # Få alla latinska namn från en växts sub-sida
 extract_name_latin <- function(html_object) {
   res <- html_object %>%
-    html_nodes("#page_content h2") %>%
+    html_nodes("#page_content > h2") %>%
     html_text() %>%
     cut_n_and_t() %>%
     fix_whitespace_size()
@@ -12,6 +12,19 @@ extract_name_latin <- function(html_object) {
 # Lägg till en "possibly" till "extract_name_latin" funktionen
 extract_name_latin_possibly <- possibly(extract_name_latin, NA)
 
+# Ladda in det isländska namnet
+extract_name_is <- function(html_object) {
+  res <- html_object %>%
+    html_nodes("#page_content > h1") %>%
+    html_text() %>%
+    cut_n_and_t() %>%
+    fix_whitespace_size()
+  
+  return (res)
+}
+
+# Lägg till en "possibly" till "extract_name_is" funktionen
+extract_name_is_possibly <- possibly(extract_name_is, NA)
 
 # Få alla bilder från en växts sub-sida
 extract_images <- function(html_object, add_tag) {

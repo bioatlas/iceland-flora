@@ -27,8 +27,6 @@ message("Done loading libraries, starting to load files...")
 source("functions.R", encoding = "utf-8")
 source("cleanup_functions.R", encoding = "utf-8")
 source("main_function.R", encoding = "utf-8")
-source("scrape.R", encoding = "utf-8")
-
 
 
 # Skapa de vaiablar som är globala
@@ -57,4 +55,4 @@ if (use_actual_website) {
 # Kör koden för att skrapa hemsidan
 message("Done setting global vaiables, running code:")
 
-scrape()
+source("scrape.R", encoding = "utf-8")
