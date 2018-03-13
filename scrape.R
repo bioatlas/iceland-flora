@@ -78,12 +78,3 @@ message("The amount of species in the data: ", taxon_core_tibble[, 1] %>%
 
 message("The amount of images in the data: ", simple_multimedia_tibble[, 1] %>%
           unlist() %>% unname() %>% length())
-
-taxon_core_tibble %>%
-  group_by(taxonRemarks, taxonID) %>%
-  summarise(count = n()) %>%
-  filter(count > 1) %>%
-  arrange(desc(count)) %>%
-  select(-taxonID)
-
-

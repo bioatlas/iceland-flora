@@ -95,9 +95,11 @@ extract_image_desciptions_possibly <- possibly(extract_image_desciptions, NA)
 # Få alla huvud-texter
 extract_main_text <- function(html_object, subsite) {
   res <- html_object %>%
-    html_nodes("#page_content > h2 + *") %>%
+    html_nodes("#page_content > h2 ~ *") %>%
     html_text() %>%
-    clean_up_vector()
+    clean_up_vector() %>%
+    paste(collapse = ". ") %>%
+    fix_dots_and_spaces()
   
   title_is <- html_object %>%
     html_nodes("#page_content > h1") %>%

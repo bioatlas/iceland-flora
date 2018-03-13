@@ -77,10 +77,10 @@ add_space_after_dots <- function(str) {
   return (str)
 }
 
-# Ta bort ".. " från en sträng
+# Ta bort ". . " från en sträng
 cut_dot_dot_space <- function(str) {
   str <- str %>%
-    str_replace_all("\\.\\. ", "\\.")
+    str_replace_all("\\. \\. ", "\\.")
   
   return (str)
 }
