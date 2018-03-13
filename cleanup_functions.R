@@ -7,7 +7,6 @@ cut_white_space <- function(vec) {
   return (vec)
 }
 
-
 # Ta bort alla '\n' och alla '\t' ur en sträng
 cut_n_and_t <- function(str) {
   str <- str %>%
@@ -16,7 +15,6 @@ cut_n_and_t <- function(str) {
   
   return (str)
 }
-
 
 # Ta bort alla 'nbsp;' ur en sträng
 cut_nbsp <- function(str) {
@@ -34,9 +32,9 @@ cut_par <- function(vec) {
   return (vec)
 }
 
-# Lägg ihop vectorer baserat på mellanrum för att få en vector utan toma 
-# vectorer och för att slippa använda jobbiga xpath selektorer för att få 
-# flera stycken som en sträng
+# Lägg ihop vektorer baserat på mellanrum för att få en vektor utan toma 
+# vektorer och för att slippa använda jobbiga xpath selektorer för att få 
+# flera stycken noder som en enda sträng
 fix_image_desc_para <- function(img_desc) {
   newVec <- vector()
   
