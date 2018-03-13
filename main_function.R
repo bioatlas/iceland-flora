@@ -82,6 +82,9 @@ get_information_from_subsite <- function(site_url, subsite_url) {
   # Ladda alla sidor så att vi slipper ladda de individuellt för varje egenskap (namn på latin, bilder, bild-texter mm)
   loaded_html_sites <- map(urls, function(x) read_html(x, encoding = "utf-8"))
   
+  # Lägg till "http://www." för att de ska vara fulla länkar
+  urls <- paste0("http://www.", urls)
+  
   # Läs in alla latinska namn till alla växter
   vaxter_namn_latin <- map_chr(loaded_html_sites, extract_name_latin_possibly)
   
@@ -116,7 +119,7 @@ get_information_from_subsite <- function(site_url, subsite_url) {
       list()
   }
   
-  image_tibble <- tibble(page_url = urls[1], img_url = unlist(image_urls[1]), img_desc = unlist(image_desc[1]))
+  image_tibble <- tibble(page_url = urls[1], img_url = paste0("http://www.", unlist(image_urls[1])), img_desc = unlist(image_desc[1]))
   
   if (length(image_urls) >= 2) {
     for (n in 2:length(image_urls)) {
@@ -151,7 +154,7 @@ get_information_from_subsite <- function(site_url, subsite_url) {
       }
       
       image_tibble <- image_tibble %>%
-        bind_rows(tibble(page_url = urls[n], img_url = unlist(image_urls[n]), img_desc = unlist(image_desc[n])))
+        bind_rows(tibble(page_url = urls[n], img_url = paste0("http://www.", unlist(image_urls[n])), img_desc = unlist(image_desc[n])))
     }
   }
   
