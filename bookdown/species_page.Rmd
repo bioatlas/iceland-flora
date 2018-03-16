@@ -1,0 +1,13 @@
+---
+title: "Iceland Flora"
+output: html_document
+params:
+  dwca_path: "flora.zip"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+# dwca_file <- system.file(params$dwca_path, package = "finch")
+out <- dwca_read(params$dwca_path, read = TRUE)
+```
