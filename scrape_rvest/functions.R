@@ -27,7 +27,7 @@ extract_name_is <- function(html_object) {
 extract_name_is_possibly <- possibly(extract_name_is, NA)
 
 # Få alla bilder från en växts sub-sida
-extract_images <- function(html_object, add_tag) {
+extract_images <- function(html_object, add_tag, url) {
   res <- html_object %>%
     html_nodes("#right_col > p > a[href]") %>%
     html_attr("href")
@@ -51,18 +51,30 @@ extract_images <- function(html_object, add_tag) {
   if (!is.na(more_images[1])) {
     res <- c(res, unlist(more_images)) %>%
       unique()
+    if (print_exceptions) {
+      print(paste0("Some image(s) on this page was under #right_col > p > font and then an <a> obj: ", url))
+    }
   }
   if (!is.na(more_images2[1])) {
     res <- c(res, unlist(more_images2)) %>%
       unique()
+    if (print_exceptions) {
+      print(paste0("Some image(s) on this page was under #right_col > p and then a <img> obj: ", url))
+    }
   }
   if (!is.na(more_images3[1])) {
     res <- c(res, unlist(more_images3)) %>%
       unique()
+    if (print_exceptions) {
+      print(paste0("Some image(s) on this page was under #right_col and then an <a> obj: ", url))
+    }
   }
   if (!is.na(more_images4[1])) {
     res <- c(res, unlist(more_images4)) %>%
       unique()
+    if (print_exceptions) {
+      print(paste0("Some image(s) on this page was under #right_col and then a <img> obj: ", url))
+    }
   }
   
   res <- paste0(main_site_url, add_tag, res)

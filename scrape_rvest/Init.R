@@ -11,11 +11,7 @@ library(purrr)
 library(dplyr)
 
 # Set 'working directory' så att vi kan scrapa från våran lokala nedladning av hemsidan 
-# Linux
-# setwd("~/repos/iceland-flora/")
 
-# Windows
-# setwd("D:/Code/R/RStudio/iceland-flora/")
 
 # Universal
 dir <- dirname(rstudioapi::getSourceEditorContext()$path)
@@ -51,6 +47,9 @@ svampar_subsite_url <- "sveppir.html"
 if (use_actual_website) {
   main_site_url <- paste0("http://www.", main_site_url)
 }
+
+# Om man ska printa alla undantag
+print_exceptions <- TRUE
 
 # Kör koden för att skrapa hemsidan
 message("Done setting global vaiables, running code:")

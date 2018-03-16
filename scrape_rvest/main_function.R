@@ -41,8 +41,6 @@ get_information_from_subsite <- function(site_url, subsite_url) {
     # Undantag för lavar
     vaxter <- vaxter[-155]
     
-    vaxter <- vaxter[2:length(vaxter)]
-    
     bild_tag <- "FLETTUR/"
     # Lichen (lavar)
     theme_str <- "Lichens"
@@ -72,6 +70,28 @@ get_information_from_subsite <- function(site_url, subsite_url) {
     urls <- urls[1:only_load_the_n_firsts_species]
   }
   
+  if (print_exceptions) {
+    urls_save <- urls
+    
+    urls <- urls[duplicated(urls)]
+    
+    dup_names <- list()
+    
+    for (n in 1:length(vaxter_html)) {
+      if (paste0(site_url, vaxter_html[n]) %in% urls) {
+        if (exists(paste0(site_url, vaxter_html[n]), where = dup_names)) {
+          dup_names[paste0(site_url, vaxter_html[n])] <- list(c(unlist(dup_names[paste0(site_url, vaxter_html[n])]), html_text(vaxter[n])))
+        } else {
+          dup_names[paste0(site_url, vaxter_html[n])] <- list(html_text(vaxter[n]))
+        }
+      }
+    }
+    
+    print(dup_names)
+    
+    urls <- urls_save
+  }
+  
   # Ta bort kopior av länkar (Flera namn till samma växt som pekar på samma html sida)
   urls <- urls %>%
     unique()
@@ -94,7 +114,7 @@ get_information_from_subsite <- function(site_url, subsite_url) {
   vaxter_namn_is <- map_chr(loaded_html_sites, extract_name_is_possibly)
   
   # Läs in alla bilder till alla växter
-  image_urls <- map2(loaded_html_sites, bild_tag, extract_images_possibly)
+  image_urls <- pmap(list(loaded_html_sites, bild_tag, urls), extract_images_possibly)
   
   image_desc <- map(loaded_html_sites, extract_image_desciptions_possibly)
   
@@ -116,6 +136,9 @@ get_information_from_subsite <- function(site_url, subsite_url) {
       fix_dots_and_spaces() %>%
       cut_par() %>%
       list()
+    if (print_exceptions) {
+      print(paste0("Some image(s) on this page have their description on multiple <p> objects: ", urls[n]))
+    }
   } else {
     image_desc[1] <- test_desc %>%
       list()
@@ -147,6 +170,9 @@ get_information_from_subsite <- function(site_url, subsite_url) {
           fix_dots_and_spaces() %>%
           cut_par() %>%
           list()
+        if (print_exceptions) {
+          print(paste0("Some image(s) on this page have their description on multiple <p> objects: ", urls[n]))
+        }
       } else {
         image_desc[n] <- test_desc %>%
           list()
