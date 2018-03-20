@@ -70,6 +70,8 @@ get_information_from_subsite <- function(site_url, subsite_url) {
     urls <- urls[1:only_load_the_n_firsts_species]
   }
   
+  print(theme_str)
+  
   if (print_exceptions) {
     urls_save <- urls
     
